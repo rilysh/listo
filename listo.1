@@ -1,0 +1,25 @@
+.Dd April 2, 2023
+.Dt LISTO 1
+.Os
+.Sh NAME
+.Nm listo
+.Nd A small list management program
+.Sh COMMANDS
+.Bl -tag -width x
+.It Nm -a Ar item(0)..item(n)
+.Nd Append item(s) in a already existing list file
+.It Nm -d
+.Nd Print all existing list(s)
+.It Nm -e
+.Nd Edit a list entry to make it current
+.It Nm -n Ar item(0)..item(n)
+.Nd Create a new list with pre-adjusted item(s)
+.It Nm -o
+.Nd Open the list file to a terminal-based editor
+.It Nm -p Op Ar t
+.B
+.Nd Print all items from the most recent file. t here stands for true which specify to print line numbers
+.It Nm -r
+.Nd Purge all old list(s)
+.It Nm -l Ar lnum
+.Nd Delete a specific line from the current list
