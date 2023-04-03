@@ -1,5 +1,5 @@
 PROGRAM = listo
-FLAGS = -Wall -Wextra -O2 -s
+FLAGS = -Wall -Wextra -g
 
 all:
 	${CC} ${FLAGS} ${PROGRAM}.c -o ${PROGRAM}

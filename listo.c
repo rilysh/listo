@@ -176,8 +176,8 @@ static void print_have_list(int line_nums)
             }
         }
     } else {
-        fread(buf, 1L, (unsigned long)size, fp);
-        fprintf(stdout, "%s", buf);
+        while ((c = fgetc(fp)) != EOF)
+            fprintf(stdout, "%c", c);
     }
 
     /* Add a newline, as the text file won't have a newline before EOF */
@@ -272,6 +272,8 @@ static void rm_line(long line)
     cur = 1;
     matched = 0; /* Temporary boolean alike to check if cur and line matched together */
 
+    memset(buf, '\0', (size + 1));
+
     while (fgets(buf, size, fp) != NULL) {
         if (cur != line)
             fprintf(fw, "%s", buf);
@@ -283,20 +285,28 @@ static void rm_line(long line)
             if (matched != 1) {
                 fprintf(stderr, "Error: Couldn't find line number %ld\n", line);
 
-                fclose(fp);
-                fclose(fw);
-                free(krf);
-                free(buf);
+                goto cleanup;
             }
+
             fseek(fw, -1, SEEK_END);
             fputc('\0', fw);
+            fprintf(stdout, "OK: Removed\n");
         }
+
+        if (ferror(fp))
+            goto cleanup;
 
         cur++;
     }
 
     if (rename(fpath, krf) != 0)
         perrnor(EXIT_FAILURE, "rename()");
+
+cleanup:
+    fclose(fp);
+    fclose(fw);
+    free(krf);
+    free(buf);
 }
 
 static void print_all_lists(void)
