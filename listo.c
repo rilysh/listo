@@ -190,32 +190,39 @@ static void print_have_list(int line_nums)
 
 static void open_with_editor(char *filename)
 {
-    char *krf, *args[4];
+    char *krf, *args[5];
     int size, i;
 
     if (filename != NULL) {
         krf = filename;
     } else {
         krf = keep_recent_file(NULL);
+        if(krf == NULL) {
+            fprintf(stderr, "Error: No recent file to open\n");
+            exit(EXIT_FAILURE);
+        }
 
         if (krf == NULL)
             errnor(EXIT_FAILURE, "Error: No recently created list was found");
     }
 
     size = ARRAY_SIZE(edt) + 1;
-    args[1] = krf;
+    args[0] = krf;
 
     for (i = 0; i < size; i++) {
         if (access(edt[i].path, F_OK) != -1) {
             args[0] = edt[i].path;
+            fprintf(stdout, "PATH: %s\n", args[0]);
 
             fprintf(stdout,
                 "Info: Trying to open %s with %s\n", krf, edt[i].editor
             );
 
+            /* The array passed to execv() must end with NULL */
+            args[4] = NULL;
+
             if (execv(edt[i].path, args) == -1) {
                 perror("execv()");
-                free(krf);
             }
         }
 
@@ -225,8 +232,6 @@ static void open_with_editor(char *filename)
                 "(Supported editors: ed, micro, nano, nvim, vi and vim)\n"
             );
     }
-
-    free(krf);
 }
 
 static void rm_line(long line)
@@ -329,8 +334,18 @@ static void print_all_lists(void)
     strcat(buf, "/.listo");
 
     dir = opendir(buf);
+    if(dir == NULL) {
+        fprintf(stdout, "Error: No lists found\n");
+        exit(EXIT_FAILURE);
+    }
+
     i = 1;
     krf = keep_recent_file(NULL);
+
+    if(krf == NULL) {
+        fprintf(stdout, "Error: No recent file found\n");
+        exit(EXIT_FAILURE);
+    }
 
     fprintf(stdout, "KRF: %s\n", krf);
 
@@ -374,6 +389,11 @@ static void edit_recent_one(void)
     strcat(buf, pd->pw_name);
     strcat(buf, "/.listo/");
     strcat(buf, RECENT_VIEW_FILE);
+
+    if(access(buf, F_OK) != 0) {
+        fprintf(stdout, "Error: No recent list to edit\n");
+        exit(EXIT_FAILURE);
+    }
 
     open_with_editor(buf);
 }

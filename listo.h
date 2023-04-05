@@ -34,10 +34,12 @@ struct Editors edt[] = {
 static FILE *xopen(const char *filename, const char *modes)
 {
     FILE *fp = fopen(filename, modes);
+    char err_msg[128] = { '\0' };
 
     if (fp == NULL) {
-        perror("fopen()");
-        return NULL;
+        sprintf(err_msg, "fopen(): %s", filename);
+        perror(err_msg);
+        exit(EXIT_FAILURE);
     }
 
     return fp;
