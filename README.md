@@ -19,3 +19,6 @@ Note, each of these "i" is referred to an item. That means you can add more than
 
 ### Others
 If you want to send patches, you can also send them to my mailbox.
+
+### Thanks
+[jhx](https://github.com/jhx0) - Notified multiple issues, especially with error handling
