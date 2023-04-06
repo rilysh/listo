@@ -216,6 +216,7 @@ static void open_with_editor(char *filename)
             if (execv(edt[i].path, args) == -1) {
                 perror("execv()");
                 free(krf);
+                exit(EXIT_FAILURE);
             }
         }
 
@@ -328,14 +329,16 @@ static void print_all_lists(void)
     strcat(buf, pd->pw_name);
     strcat(buf, "/.listo");
 
-    dir = opendir(buf);
     i = 1;
-    krf = keep_recent_file(NULL);
-
-    fprintf(stdout, "KRF: %s\n", krf);
+    dir = opendir(buf);
 
     if (dir == NULL)
-        perrnor(EXIT_FAILURE, "opendir()");
+        errnor(EXIT_FAILURE, "Error: It seems quite empty here");
+
+    krf = keep_recent_file(NULL);
+
+    if (krf == NULL)
+        errnor(EXIT_FAILURE, "Error: No recently created list was found");
 
     while ((den = readdir(dir)) != NULL) {
         if (strcmp(den->d_name, ".") == 0 ||
@@ -374,6 +377,10 @@ static void edit_recent_one(void)
     strcat(buf, pd->pw_name);
     strcat(buf, "/.listo/");
     strcat(buf, RECENT_VIEW_FILE);
+
+    if (access(buf, F_OK) != 0)
+        /* We'd expect file to be in .recent_view */
+        perrnor(EXIT_FAILURE, "access()");
 
     open_with_editor(buf);
 }
